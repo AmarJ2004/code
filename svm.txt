@@ -33,3 +33,10 @@ print(confusion_matrix(y_test,y_pred))
 #4 set SVC(kernel='linear',C = 0.1) & print(confusion_matrix(y_test,y_pred))
 #5 set SVC(kernel='rbf',gamma = 0.01)
 #6 set SVC(kernel='poly',degree=2)
+
+#param_grid = {'C': [0.9], 'degree': [2], 'gamma': [0.05], 'kernel': ['rbf']}
+#grid_search = GridSearchCV(SVC(), param_grid, scoring='accuracy', cv=10)
+#grid_search.fit(x_train, y_train)
+#y_pred = grid_search.predict(x_test)
+#print(grid_search.best_score_)
+#print(grid_search.best_params_)
