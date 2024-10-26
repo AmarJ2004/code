@@ -1,0 +1,18 @@
+IDFS
+def idfs(graph, start, end):
+    queue= [(start, [start])]
+    visited = set()
+    while queue:
+        node, path = queue.pop()
+        if node == end: 
+            return path
+        if node not in visited:
+            visited.add(node)
+            queue.extend((neighbor, path + [neighbor]) 
+            for neighbor in graph[node])
+
+start_node = input("Enter a start node: ")
+end_node = input("Enter a end node: ")
+result = idfs(dict_gn, start_node, end_node)
+print(result)
+

@@ -1,0 +1,19 @@
+import pandas as pd
+from sklearn.svm import SVC
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.model_selection import cross_val_score
+from sklearn.preprocessing import LabelEncoder
+import numpy as np
+
+data = pd.read_csv('iris_csv.csv')
+x = data.iloc[:, :-1].apply(LabelEncoder().fit_transform)
+y = LabelEncoder().fit_transform(data.iloc[:, -1])
+
+ada_tree = AdaBoostClassifier(n_estimators=30, random_state=7)
+tree_accuracy = cross_val_score(ada_tree, x, y, cv=10).mean()
+print(f'Accuracy with Decision Trees: {tree_accuracy}')
+
+svc = SVC(probability=True, kernel='linear', random_state=7)
+ada_svc = AdaBoostClassifier(n_estimators=50, base_estimator=svc, random_state=7)
+svc_accuracy = cross_val_score(ada_svc, x, y, cv=10).mean()
+print(f'Accuracy with SVC: {svc_accuracy}')

@@ -1,0 +1,35 @@
+import pandas as pd
+import seaborn as sea
+from sklearn.svm import SVC
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split,cross_val_score,GridSearchCV
+from sklearn.metrics import classification_report,accuracy_score,confusion_matrix
+
+data = pd.read_csv('Breast_cancer_data.csv')
+sea.heatmap(data.corr())
+
+x, y = data.drop("diagnosis", axis=1), data["diagnosis"]
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, random_state=1)
+
+for kernel, params in [('linear', {}), ('rbf', {'gamma': 2})]:
+    model = SVC(C=10, kernel=kernel, **params).fit(x_train, y_train)
+    acc = accuracy_score(y_test, model.predict(x_test))
+    print(f'accuracy({kernel}):', round(acc * 100, 2))
+
+data = pd.read_csv('Social_Network_Ads.csv')
+x, y = data.iloc[:, [2, 3]].values, data.iloc[:, 4].values
+x = StandardScaler().fit_transform(x)
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state=0)
+
+svc = SVC()
+y_pred = svc.fit(x_train, y_train).predict(x_test) 
+print('Accuracy:', round(accuracy_score(y_test, y_pred) * 100, 2))
+print(confusion_matrix(y_test,y_pred))
+
+#Optimization part changes
+#1. SVC(kernel='linear')
+#2. print(classification_report(y_test, y_pred))
+#3. print(cross_val_score(svc,x,y,cv=10,scoring='accuracy').mean())
+#4 set SVC(kernel='linear',C = 0.1) & print(confusion_matrix(y_test,y_pred))
+#5 set SVC(kernel='rbf',gamma = 0.01)
+#6 set SVC(kernel='poly',degree=2)

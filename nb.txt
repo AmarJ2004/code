@@ -1,0 +1,22 @@
+import pandas as pd
+from sklearn.naive_bayes import BernoulliNB
+from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+
+s = pd.read_csv("Stolen.csv")
+x = s.iloc[:, :3].apply(LabelEncoder().fit_transform).values
+y = LabelEncoder().fit_transform(s['ans'])
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3)
+
+ber = BernoulliNB().fit(x_train, y_train)
+y_pred = ber.predict(x_test)
+print("Total mislabeled points: %d" % ((y_test != y_pred).sum()))
+print("Accuracy:", accuracy_score(y_test, y_pred))
+print("Confusion Matrix:\n", confusion_matrix(y_test, y_pred))
+
+y_prob = pd.DataFrame(ber.predict_proba(x_test), columns=ber.classes_)
+print(y_prob)
+print("Prediction for [0,1,0]:", ber.predict([[0, 1, 0]]))
+print("Probabilities for [0,1,0]:", ber.predict_proba([[0, 1, 0]]))
+
