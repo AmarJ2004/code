@@ -1,0 +1,262 @@
+P1
+sales = pd.read_csv('path')
+customer_data = pd.read_csv('path')
+merge
+merged_data = pd.merge(sales,customer_data,on='Customer ID',how='inner') #how=’left’ for q2
+rename
+merged_data.rename(columns = {'Date':'Transaction Date',},inplace = True)
+removes empty
+merged_data.dropna(subset=['Total Sale Amount'],inplace=True)
+replace empty
+merged_data['Customer Email']=merged_data['Customer Email'].fillna('Unknown')
+change datatype
+merged_data['Transaction Date']=pd.to_datetime(merged_data['Transaction Date'])
+display sales/customer
+total_sales_by_customer = merged_data.groupby('Customer Name')[['Total Sale Amount']].sum()
+display records
+transactions_per_customer = merged_data.groupby('Customer ID')['Transaction ID'].nunique()
+find max
+max = merged_data.max()
+export
+merged_data.to_csv('path',index=False)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+P2
+import numpy as np
+import pandas as pd
+from sklearn.datasets import load_iris
+from sklearn.feature_selection import VarianceThreshold
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+iris = load_iris()
+X = pd.DataFrame(iris.data,columns = iris.feature_names)
+y = iris.target
+
+VT = VarianceThreshold(threshold=0.2)
+VT_red = VT.fit_transform(X)
+VT_red_df = pd.DataFrame(VT_red,columns = X.columns[VT.get_support()])
+
+CM = X.corr()
+plt.figure(figsize=(8,6))
+sns.heatmap(CM,annot = True,cmap="coolwarm",fmt=".2f")
+plt.title("CM")
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+P3
+Import online retail csv
+df_cleaned = df.dropna(subset=['Description','CustomerID']).copy()
+df_cleaned = df_cleaned.copy()
+
+df_cleaned['PriceCategory'] = pd.cut(
+    df_cleaned['UnitPrice'],
+    bins=[-float('inf'), 0, 5, 20, 50, 100, 500, 1000, float('inf')],
+    labels=['invalid', 'Free', 'Cheap', 'Affordable', 'Moderate', 'Expensive', 'Very Expensive', 'Luxury'],
+    include_lowest=True
+)
+
+df_cleaned['QCutQuantityCategory'] = pd.qcut(
+    df_cleaned['Quantity'],
+    q=4,
+    labels=['Very Low', 'Low', 'Medium', 'High']
+)
+
+product_hierarchy = {'WHITE HANGING HEART T-LIGHT HOLDER': 'Home Decor', }
+df_cleaned['ProductCategory'] = df_cleaned['Description'].map(product_hierarchy).fillna('Other')
+print(df_cleaned.head())
+
+
+
+
+
+
+
+
+
+
+
+
+P4
+import pandas as pd
+from mlxtend.frequent_patterns import apriori, association_rules
+store_data = pd.read_csv("store_data.csv",header=None).fillna(0)
+
+record = [
+    [str(val) for val in row if str(val) != '0']
+    for row in store_data.values
+]
+
+itemsets = pd.DataFrame.from_records(
+    [{item: 1 for item in transaction} for transaction in record]
+).fillna(0).astype(int)
+
+frequent_itemsets = apriori(itemsets, min_support=0.045, use_colnames=True)
+rules = association_rules(frequent_itemsets, metric="confidence", min_threshold=0.2)
+
+filtered_rules = rules[rules['lift'] >= 3]
+print("Association rules:")
+for _, rule in filtered_rules.iterrows():
+    print(f"Rule: {rule['antecedents']} -> {rule['consequents']}")
+    print(f"Support: {rule['support']}")
+    print(f"Confidence: {rule['confidence']}")
+    print(f"Lift: {rule['lift']}")
+    print("=====================================")
+
+
+
+
+
+
+
+
+P7
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.datasets import load_iris
+
+iris = load_iris()
+df = pd.DataFrame(iris.data, columns=['Sep_len', 'Sep_Wid', 'Pet_len', 'Pet_Wid'])
+
+lr = LinearRegression()
+lr.fit(df[['Pet_len']], df['Pet_Wid'])
+
+plt.scatter(df['Pet_len'], df['Pet_Wid'], color='red')
+plt.plot(df['Pet_len'], lr.predict(df[['Pet_len']]), color='blue')
+plt.xlabel('Petal Length')
+plt.ylabel('Petal Width')
+plt.show()
+
+lr.predict([[2.5]])
+--------------------------------------------------------------------------------------------------------------------------------------
+from sklearn.datasets import fetch_california_housing
+
+data = fetch_california_housing()
+df = pd.DataFrame(data.data, columns=data.feature_names)
+
+lr = LinearRegression()
+lr.fit(df[['MedInc']], data.target)
+
+plt.scatter(df['MedInc'], data.target, color='red', s=5)
+plt.plot(df['MedInc'], lr.predict(df[['MedInc']]), color='blue')
+plt.xlabel('Median Income')
+plt.ylabel('House Price')
+plt.show()
+lr.predict([[3.5]])
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+
+df = pd.read_csv('advertising.csv')
+X_train, X_test, y_train, y_test = train_test_split(df[['TV']], df['Sales'], test_size=0.2, random_state=42)
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+plt.scatter(X_test, y_test, color="blue", label='Actual Sales')
+plt.plot(X_test, model.predict(X_test), color="red", label='Predicted Sales')
+plt.xlabel('TV Advertising')
+plt.ylabel('Sales')
+plt.show()
+--------------------------------------------------------------------------------------------------------------------------------------
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+df = pd.read_csv('advertising.csv')
+X = df[['TV', 'Radio', 'Newspaper']]
+y = df['Sales']
+
+model = LinearRegression()
+model.fit(X, y)
+
+y_pred = model.predict(X)
+print(f"Root Mean Squared Error: {mean_squared_error(y, y_pred, squared=False):.2f}")
+print(f"R^2 score: {r2_score(y, y_pred):.2f}")
+print("Slope: ", model.coef_)
+print("Intercept: ", model.intercept_)
+print(pd.DataFrame({'Actual sales': y, 'Predicted sales': y_pred}))
+
+P8
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.datasets import load_breast_cancer
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix
+
+cancer = load_breast_cancer()
+X = cancer.data
+y = cancer.target
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+model = LogisticRegression()
+model.fit(X_scaled, y)
+y_pred = model.predict(X_scaled)
+
+conf_matrix = confusion_matrix(y, y_pred)
+
+plt.figure(figsize=(6,5))
+sns.heatmap(conf_matrix, annot=True, fmt='d', cmap='Blues', xticklabels=["Malignant", "Benign"], yticklabels=["Malignant", "Benign"])
+plt.xlabel("Predicted Class")
+plt.ylabel("Actual Class")
+plt.title("Confusion Matrix")
+plt.show()
+
+
+
+
+
+
+P9
+import pandas as pd
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+
+df = pd.read_csv("Retail Store_2.csv", encoding="latin-1")
+df.dropna(subset=['CustomerID', 'Quantity', 'UnitPrice'], inplace=True)
+df = df[(df['Quantity'] > 0) & (df['UnitPrice'] > 0)]
+df['TotalSpend'] = df['Quantity'] * df['UnitPrice']
+df['InvoiceDate'] = pd.to_datetime(df['InvoiceDate'], format="mixed")
+snapshot_date = df['InvoiceDate'].max() + pd.Timedelta(days=1)
+df['Recency'] = (snapshot_date - df['InvoiceDate']).dt.days
+
+customer_data = df.groupby('CustomerID').agg(TotalSpend=('TotalSpend', 'sum'),
+                                              Frequency=('InvoiceNo', 'nunique'),
+                                              Recency=('Recency', 'min')).reset_index()
+
+scaler = StandardScaler()
+customer_data_scaled = scaler.fit_transform(customer_data[['TotalSpend', 'Frequency', 'Recency']])
+
+inertia = [KMeans(n_clusters=k, random_state=42).fit(customer_data_scaled).inertia_ for k in range(1, 11)]
+
+plt.plot(range(1, 11), inertia, marker='o', linestyle='--', color='b')
+plt.xlabel('number of cluster (k)')
+plt.ylabel('wcss')
+plt.title('Elbow method')
+plt.show()
